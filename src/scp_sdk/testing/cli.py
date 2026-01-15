@@ -7,7 +7,6 @@ Note: Requires 'typer' to be installed. Install with: pip install typer
 """
 
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from typing import Any, Callable
 from unittest.mock import MagicMock, patch
 
@@ -73,7 +72,7 @@ class CLITestHelper:
         """Run CLI command with temporary files.
 
         Creates a temporary directory with specified files and runs
-        the command. Useful for testing file-based operations.
+        the command. Caller is responsible for cleanup.
 
         Args:
             args: Command arguments
@@ -88,24 +87,28 @@ class CLITestHelper:
             >>> result, tmpdir = helper.run_with_temp_files(
             ...     ["sync"], files
             ... )
+            >>> # Use tmpdir...
+            >>> import shutil
+            >>> shutil.rmtree(tmpdir)  # Manual cleanup
         """
-        with TemporaryDirectory() as tmpdir:
-            tmp_path = Path(tmpdir)
+        import tempfile
 
-            # Create files
-            for filename, content in files.items():
-                file_path = tmp_path / filename
-                file_path.parent.mkdir(parents=True, exist_ok=True)
-                file_path.write_text(content)
+        tmp_path = Path(tempfile.mkdtemp())
 
-            # Update args to use temp dir if needed
-            updated_args = [
-                str(tmp_path / arg) if Path(arg).exists() or "/" in arg else arg
-                for arg in args
-            ]
+        # Create files
+        for filename, content in files.items():
+            file_path = tmp_path / filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(content)
 
-            result = self.runner.invoke(self.app, updated_args, **kwargs)
-            return result, tmp_path
+        # Update args to use temp dir if needed
+        updated_args = [
+            str(tmp_path / arg) if Path(arg).exists() or "/" in arg else arg
+            for arg in args
+        ]
+
+        result = self.runner.invoke(self.app, updated_args, **kwargs)
+        return result, tmp_path
 
     def mock_graph_load(self, mock_graph: Any) -> Any:
         """Context manager to mock Graph.from_file().
