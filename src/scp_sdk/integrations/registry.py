@@ -1,6 +1,6 @@
 """Plugin registry for integrations."""
 
-from typing import Any, Callable
+from typing import Callable
 import logging
 
 _REGISTRY: dict[str, type] = {}

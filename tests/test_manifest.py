@@ -1,8 +1,6 @@
 """Test Manifest class."""
 
-import pytest
-from pathlib import Path
-from scp_sdk.core.manifest import Manifest, ValidationResult
+from scp_sdk.core.manifest import Manifest
 
 
 def test_manifest_from_yaml():

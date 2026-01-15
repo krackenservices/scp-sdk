@@ -112,14 +112,12 @@ result = integration.sync(graph)
 
 The SDK handles:
 
-- ✅ Graph iteration
-- ✅ Error handling & retries
-- ✅ Logging
-- ✅ Dry-run mode
-- ✅ ID caching
-- ✅ Field mapping utilities
-
-**Result**: ~50 lines of code instead of ~700!
+- Graph iteration
+- Error handling & retries
+- Logging
+- Dry-run mode
+- ID caching
+- Field mapping utilities
 
 ## Development
 
@@ -144,25 +142,6 @@ make check
 
 # Run examples
 make examples
-```
-
-## Project Structure
-
-```
-scp-sdk/
-├── src/scp_sdk/
-│   ├── core/              # Core models and graph
-│   │   ├── models.py      # Pydantic models
-│   │   ├── manifest.py    # Manifest loader/query
-│   │   └── graph.py       # Graph data structure
-│   └── integrations/      # Integration framework
-│       ├── base.py        # Base class
-│       ├── config.py      # Configuration
-│       ├── utils.py       # Utilities
-│       └── registry.py    # Plugin registry
-├── examples/              # Usage examples
-├── tests/                 # Test suite
-└── docs/                  # Documentation
 ```
 
 ## Examples

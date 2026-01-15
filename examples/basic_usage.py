@@ -1,7 +1,7 @@
 """Basic usage example - loading and querying SCP manifests and graphs."""
 
-from pathlib import Path
 from scp_sdk import Manifest, Graph
+
 
 def main():
     print("=== SCP SDK Basic Usage Example ===\n")
@@ -46,7 +46,7 @@ depends:
     # Query a specific dependency
     dep = manifest.get_dependency("urn:scp:user-service")
     if dep:
-        print(f"\n   Dependency on user-service:")
+        print("\n   Dependency on user-service:")
         print(f"     Type: {dep.type}")
         print(f"     Criticality: {dep.criticality}")
         print(f"     Failure Mode: {dep.failure_mode}")

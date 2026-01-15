@@ -34,7 +34,7 @@ class SystemNode:
             SystemNode instance
         """
         capabilities = [cap.capability for cap in manifest.capabilities]
-        
+
         contacts = None
         escalation = None
         if manifest.data.ownership:
@@ -288,19 +288,19 @@ class Graph:
                 "name": system.name,
             }
             if system.tier is not None:
-                node["tier"] = system.tier
+                node["tier"] = system.tier  # type: ignore[assignment]
             if system.domain:
-                node["domain"] = system.domain
+                node["domain"] = system.domain  # type: ignore[assignment]
             if system.team:
-                node["team"] = system.team
+                node["team"] = system.team  # type: ignore[assignment]
             if system.otel_service_name:
-                node["otel_service_name"] = system.otel_service_name
+                node["otel_service_name"] = system.otel_service_name  # type: ignore[assignment]
             if system.capabilities:
-                node["capabilities"] = system.capabilities
+                node["capabilities"] = system.capabilities  # type: ignore[assignment]
             if system.contacts:
-                node["contacts"] = system.contacts
+                node["contacts"] = system.contacts  # type: ignore[assignment]
             if system.escalation:
-                node["escalation"] = system.escalation
+                node["escalation"] = system.escalation  # type: ignore[assignment]
 
             nodes.append(node)
 
@@ -312,15 +312,15 @@ class Graph:
                 "type": "DEPENDS_ON",
             }
             if edge.capability:
-                e["capability"] = edge.capability
+                e["capability"] = edge.capability  # type: ignore[assignment]
             if edge.type:
-                e["dependency_type"] = edge.type
+                e["dependency_type"] = edge.type  # type: ignore[assignment]
             if edge.criticality:
-                e["criticality"] = edge.criticality
+                e["criticality"] = edge.criticality  # type: ignore[assignment]
             if edge.failure_mode:
-                e["failure_mode"] = edge.failure_mode
+                e["failure_mode"] = edge.failure_mode  # type: ignore[assignment]
             if edge.timeout_ms is not None:
-                e["timeout_ms"] = edge.timeout_ms
+                e["timeout_ms"] = edge.timeout_ms  # type: ignore[assignment]
 
             edges.append(e)
 

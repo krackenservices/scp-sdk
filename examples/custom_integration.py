@@ -23,7 +23,7 @@ class PagerDutyIntegration(IntegrationBase):
         self.logger.info(f"Syncing system to PagerDuty: {system.name}")
 
         # Map SCP data to PagerDuty format
-        service_data = {
+        _service_data = {
             "name": system.name,
             "description": f"SCP System: {system.urn}",
             # Use escalation from SCP if available
@@ -121,7 +121,7 @@ def main():
     print("Running sync in dry-run mode...")
     result = integration.sync(graph, dry_run=True)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Systems synced: {result.systems_synced}")
     print(f"  Dependencies synced: {result.dependencies_synced}")
     print(f"  Errors: {len(result.errors)}")

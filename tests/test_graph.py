@@ -1,6 +1,5 @@
 """Test Graph class."""
 
-import pytest
 from scp_sdk.core.graph import Graph, SystemNode, DependencyEdge
 from scp_sdk.core.manifest import Manifest
 
@@ -94,8 +93,12 @@ def test_dependencies_of():
     ]
 
     edges = [
-        DependencyEdge(from_urn="urn:scp:a", to_urn="urn:scp:b", criticality="required"),
-        DependencyEdge(from_urn="urn:scp:a", to_urn="urn:scp:c", criticality="optional"),
+        DependencyEdge(
+            from_urn="urn:scp:a", to_urn="urn:scp:b", criticality="required"
+        ),
+        DependencyEdge(
+            from_urn="urn:scp:a", to_urn="urn:scp:c", criticality="optional"
+        ),
     ]
 
     graph = Graph(systems=systems, edges=edges)
@@ -123,8 +126,12 @@ def test_dependents_of():
     ]
 
     edges = [
-        DependencyEdge(from_urn="urn:scp:a", to_urn="urn:scp:c", criticality="required"),
-        DependencyEdge(from_urn="urn:scp:b", to_urn="urn:scp:c", criticality="required"),
+        DependencyEdge(
+            from_urn="urn:scp:a", to_urn="urn:scp:c", criticality="required"
+        ),
+        DependencyEdge(
+            from_urn="urn:scp:b", to_urn="urn:scp:c", criticality="required"
+        ),
     ]
 
     graph = Graph(systems=systems, edges=edges)
@@ -145,7 +152,9 @@ def test_to_dict():
     ]
 
     edges = [
-        DependencyEdge(from_urn="urn:scp:a", to_urn="urn:scp:b", criticality="required"),
+        DependencyEdge(
+            from_urn="urn:scp:a", to_urn="urn:scp:b", criticality="required"
+        ),
     ]
 
     graph = Graph(systems=systems, edges=edges)
