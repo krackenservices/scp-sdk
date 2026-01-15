@@ -150,8 +150,8 @@ class ManifestFixture:
                 escalation=["lead", "manager", "director"],
             ),
             provides=[
-                Capability(capability="user-api", type="rest"),
-                Capability(capability="user-events", type="event"),
+                Capability(capability="user-api", type="rest"),  # type: ignore[call-arg]
+                Capability(capability="user-events", type="event"),  # type: ignore[call-arg]
             ],
             depends=[
                 Dependency(
