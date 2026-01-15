@@ -41,7 +41,13 @@ from .integrations.base import (
 from .utils import TierUtils
 
 # Testing utilities
-from .testing import GraphFixture, ManifestFixture
+from .testing import (
+    GraphFixture,
+    ManifestFixture,
+    CLITestHelper,
+    MockConfig,
+    create_mock_client,
+)
 
 __all__ = [
     "__version__",
@@ -78,4 +84,7 @@ __all__ = [
     # Testing
     "GraphFixture",
     "ManifestFixture",
+    "CLITestHelper",
+    "MockConfig",
+    "create_mock_client",
 ]
