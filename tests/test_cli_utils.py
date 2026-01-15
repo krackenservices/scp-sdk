@@ -43,7 +43,7 @@ class TestCLITestHelper:
     def test_run_with_args(self):
         """Should pass arguments to command."""
         helper = CLITestHelper(app)
-        result = helper.run(["hello", "Alice"])
+        result = helper.run(["hello", "--name", "Alice"])
         assert result.exit_code == 0
         assert "Hello, Alice!" in result.stdout
 
@@ -59,6 +59,11 @@ class TestCLITestHelper:
         files = {"test.txt": "Hello from file"}
 
         result, tmpdir = helper.run_with_temp_files(["hello"], files)
+
+        # Test that result is returned
+        assert result.exit_code == 0
+        # Temp dir object is returned
+        assert tmpdir is not None
 
         # Verify file was created
         test_file = tmpdir / "test.txt"
