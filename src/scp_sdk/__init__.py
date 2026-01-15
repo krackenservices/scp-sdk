@@ -28,6 +28,14 @@ from .core.models import (
 # High-level APIs
 from .core.manifest import Manifest
 from .core.graph import Graph, SystemNode, DependencyEdge
+from .core.export import export_graph_json, import_graph_json
+
+# Integration framework
+from .integrations.base import (
+    IntegrationConfig,
+    IntegrationValidator,
+    IntegrationResult,
+)
 
 __all__ = [
     "__version__",
@@ -52,4 +60,11 @@ __all__ = [
     "Graph",
     "SystemNode",
     "DependencyEdge",
+    # Export/Import
+    "export_graph_json",
+    "import_graph_json",
+    # Integration framework
+    "IntegrationConfig",
+    "IntegrationValidator",
+    "IntegrationResult",
 ]
