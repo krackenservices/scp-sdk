@@ -46,9 +46,14 @@ jobs:
             VERSION=${GITHUB_REF_NAME#v}
             echo "Type: Tagged Release"
           else
-            LAST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -n1 || echo "v0.0.0")
-            VERSION="${LAST_TAG#v}-dev"
-            echo "Type: Dev Build (Last tag: $LAST_TAG)"
+            LAST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -n1)
+            if [ -z "$LAST_TAG" ]; then
+              VERSION="0.0.0-dev"
+              echo "Type: Dev Build (No tags found)"
+            else
+              VERSION="${LAST_TAG#v}-dev"
+              echo "Type: Dev Build (Last tag: $LAST_TAG)"
+            fi
           fi
 
           echo "Syncing pyproject.toml to version: $VERSION"
