@@ -215,13 +215,13 @@ def import_graph_json(data: dict[str, Any]) -> list[SCPManifest]:
                         targets=sec.get("targets", []),
                     )
 
-                cap_data = {
-                    "capability": cap_node["name"],
-                    "type": cap_node.get("capability_type", "rest"),
-                }
-                if x_security:
-                    cap_data["x-security"] = x_security
-                provides.append(Capability.model_validate(cap_data))
+                provides.append(
+                    Capability(
+                        capability=cap_node["name"],
+                        type=cap_node.get("capability_type", "rest"),
+                        x_security=x_security,
+                    )
+                )
 
         # Build dependencies
         depends = []

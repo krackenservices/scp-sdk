@@ -37,6 +37,12 @@ from .integrations.base import (
     IntegrationResult,
 )
 
+# Utilities
+from .utils import TierUtils
+
+# Testing utilities
+from .testing import GraphFixture, ManifestFixture
+
 __all__ = [
     "__version__",
     # Models
@@ -67,4 +73,9 @@ __all__ = [
     "IntegrationConfig",
     "IntegrationValidator",
     "IntegrationResult",
+    # Utilities
+    "TierUtils",
+    # Testing
+    "GraphFixture",
+    "ManifestFixture",
 ]
