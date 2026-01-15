@@ -21,6 +21,8 @@ from .core.models import (
     Runtime,
     Environment,
     FailureMode,
+    SecurityExtension,
+    ValidationIssue,
 )
 
 # High-level APIs
@@ -43,6 +45,8 @@ __all__ = [
     "Runtime",
     "Environment",
     "FailureMode",
+    "SecurityExtension",
+    "ValidationIssue",
     # High-level APIs
     "Manifest",
     "Graph",

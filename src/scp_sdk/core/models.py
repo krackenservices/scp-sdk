@@ -22,7 +22,10 @@ class Contact(BaseModel):
 class Contract(BaseModel):
     """API contract specification reference."""
 
-    type: Literal["openapi", "asyncapi", "protobuf", "graphql", "avro", "jsonschema"] | None = None
+    type: (
+        Literal["openapi", "asyncapi", "protobuf", "graphql", "avro", "jsonschema"]
+        | None
+    ) = None
     ref: str | None = None
 
 
@@ -107,14 +110,14 @@ class FailureModeThresholds(BaseModel):
 
 class SecurityExtension(BaseModel):
     """OpenC2-inspired security capability metadata.
-    
+
     Used to describe what actions a security tool supports,
     enabling SOAR autodiscovery of security controls.
     """
 
     actuator_profile: str | None = None  # e.g., "edr", "siem", "slpf"
-    actions: list[str] = []              # e.g., "query", "contain", "deny"
-    targets: list[str] = []              # e.g., "device", "ipv4_net", "file"
+    actions: list[str] = []  # e.g., "query", "contain", "deny"
+    targets: list[str] = []  # e.g., "device", "ipv4_net", "file"
 
 
 # ============================================================================
@@ -150,7 +153,7 @@ class Ownership(BaseModel):
 
 class Capability(BaseModel):
     """A capability provided by the system."""
-    
+
     model_config = {"populate_by_name": True}
 
     capability: str
@@ -168,7 +171,10 @@ class Dependency(BaseModel):
     capability: str | None = None
     type: Literal["rest", "grpc", "graphql", "event", "data", "stream"]
     criticality: Literal["required", "degraded", "optional"]
-    failure_mode: Literal["fail-fast", "circuit-break", "fallback", "queue-buffer", "retry"] | None = None
+    failure_mode: (
+        Literal["fail-fast", "circuit-break", "fallback", "queue-buffer", "retry"]
+        | None
+    ) = None
     timeout_ms: int | None = None
     retry: RetryConfig | None = None
     circuit_breaker: CircuitBreakerConfig | None = None
@@ -194,7 +200,13 @@ class FailureMode(BaseModel):
     """Known failure mode and its characteristics."""
 
     mode: str
-    impact: Literal["total-outage", "partial-outage", "degraded-experience", "data-inconsistency", "silent-failure"]
+    impact: Literal[
+        "total-outage",
+        "partial-outage",
+        "degraded-experience",
+        "data-inconsistency",
+        "silent-failure",
+    ]
     detection: str | None = None
     recovery: str | None = None
     degraded_behavior: str | None = None
@@ -209,7 +221,7 @@ class FailureMode(BaseModel):
 
 class SCPManifest(BaseModel):
     """Root SCP manifest model.
-    
+
     This represents a complete scp.yaml file.
     """
 
@@ -235,3 +247,20 @@ class SCPManifest(BaseModel):
             if prod:
                 return prod.otel_service_name
         return None
+
+
+# ============================================================================
+# Validation Types
+# ============================================================================
+
+
+class ValidationIssue(BaseModel):
+    """Graph validation issue.
+
+    Used by Graph.validate() to report structural or semantic problems.
+    """
+
+    severity: Literal["error", "warning", "info"]
+    code: str  # e.g., "MISSING_DEPENDENCY_TARGET"
+    message: str
+    context: dict[str, str] = {}  # URN, edge details, etc.
