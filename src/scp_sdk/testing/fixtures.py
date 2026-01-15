@@ -151,9 +151,7 @@ class ManifestFixture:
             ),
             provides=[
                 Capability(capability="user-api", type="rest"),
-                Capability(
-                    capability="user-events", type="event", topics=["user.created"]
-                ),
+                Capability(capability="user-events", type="event"),
             ],
             depends=[
                 Dependency(
