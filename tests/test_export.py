@@ -127,6 +127,43 @@ def test_export_with_capabilities():
     assert len(provides_edges) == 1
 
 
+def test_roundtrip_with_security_extension():
+    """Test that x-security extension survives export/import roundtrip."""
+    from scp_sdk import SecurityExtension
+
+    manifest = SCPManifest(
+        scp="0.1.0",
+        system=System(urn="urn:scp:test:security-tool", name="Security Tool"),
+        provides=[
+            Capability(
+                capability="threat-detection",
+                type="rest",
+                **{
+                    "x-security": SecurityExtension(
+                        actuator_profile="edr",
+                        actions=["query", "contain"],
+                        targets=["device", "process"],
+                    )
+                },
+            )
+        ],
+    )
+
+    # Export then import
+    exported = export_graph_json([manifest])
+    imported = import_graph_json(exported)
+
+    # Verify x-security was preserved
+    assert len(imported) == 1
+    assert imported[0].provides is not None
+    assert len(imported[0].provides) == 1
+    cap = imported[0].provides[0]
+    assert cap.x_security is not None
+    assert cap.x_security.actuator_profile == "edr"
+    assert cap.x_security.actions == ["query", "contain"]
+    assert cap.x_security.targets == ["device", "process"]
+
+
 def test_export_replaces_stubs():
     """Test that real nodes replace stub nodes."""
     manifest_a = SCPManifest(
