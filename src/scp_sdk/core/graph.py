@@ -6,7 +6,7 @@ from typing import Iterator, Self
 import json
 
 from .manifest import Manifest
-from .models import Dependency
+from .models import Dependency, ValidationIssue
 
 
 @dataclass
@@ -261,6 +261,76 @@ class Graph:
         """
         urn = system.urn if isinstance(system, SystemNode) else system
         return self._outgoing.get(urn, [])
+
+    def validate(self) -> list[ValidationIssue]:
+        """Validate graph structure and relationships.
+
+        Checks for common structural issues:
+        - Missing dependency targets (broken edges)
+        - Orphaned systems (no incoming or outgoing edges)
+        - Self-referencing dependencies
+
+        Note: Duplicate URNs are prevented by Graph construction (dict-based storage).
+
+        Returns:
+            List of validation issues (empty if valid)
+
+        Example:
+            >>> graph = Graph.from_file("graph.json")
+            >>> issues = graph.validate()
+            >>> errors = [i for i in issues if i.severity == "error"]
+            >>> if errors:
+            >>>     print(f"Found {len(errors)} errors")
+        """
+        issues: list[ValidationIssue] = []
+
+        # Check for broken dependencies (missing targets)
+        for edge in self._edges:
+            if not self.find_system(edge.to_urn):
+                issues.append(
+                    ValidationIssue(
+                        severity="warning",
+                        code="MISSING_DEPENDENCY_TARGET",
+                        message=f"Dependency target not found: {edge.to_urn}",
+                        context={
+                            "from_urn": edge.from_urn,
+                            "to_urn": edge.to_urn,
+                            "capability": edge.capability or "",
+                        },
+                    )
+                )
+
+            # Check for self-referencing dependencies
+            if edge.from_urn == edge.to_urn:
+                issues.append(
+                    ValidationIssue(
+                        severity="warning",
+                        code="SELF_DEPENDENCY",
+                        message=f"System depends on itself: {edge.from_urn}",
+                        context={"urn": edge.from_urn},
+                    )
+                )
+
+        # Check for orphaned systems (no edges at all)
+        connected_urns = set()
+        for edge in self._edges:
+            connected_urns.add(edge.from_urn)
+            connected_urns.add(edge.to_urn)
+
+        for system in (
+            self._systems.values()
+        ):  # Changed to .values() to iterate over SystemNode objects
+            if system.urn not in connected_urns:
+                issues.append(
+                    ValidationIssue(
+                        severity="info",
+                        code="ORPHANED_SYSTEM",
+                        message=f"System has no dependencies: {system.name}",
+                        context={"urn": system.urn},
+                    )
+                )
+
+        return issues
 
     def dependents_of(self, system: SystemNode | str) -> list[DependencyEdge]:
         """Get systems that depend on this system (blast radius).
