@@ -32,15 +32,19 @@ def export_graph_json(manifests: list[SCPManifest]) -> dict[str, Any]:
 
     Returns:
         Dictionary with 'nodes', 'edges', and 'meta' keys:
-            - nodes: List of system and capability nodes
-            - edges: List of dependency and provides edges
-            - meta: Counts and statistics
+            - nodes: List of system and capability nodes. Each node has 'id', 'type', and properties.
+            - edges: List of dependency and provides edges. Each edge has 'from', 'to', 'type'.
+            - meta: Counts and statistics (systems_count, capabilities_count, etc).
 
     Example:
         >>> from scp_sdk import Manifest, export_graph_json
         >>> manifests = [Manifest.from_file("scp.yaml")]
         >>> graph_data = export_graph_json(manifests)
-        >>> print(graph_data["meta"]["systems_count"])
+        >>>
+        >>> # Save to file
+        >>> import json
+        >>> with open("graph.json", "w") as f:
+        >>>     json.dump(graph_data, f, indent=2)
     """
     nodes: list[dict] = []
     edges: list[dict] = []
@@ -139,22 +143,28 @@ def import_graph_json(data: dict[str, Any]) -> list[SCPManifest]:
     enabling transformation workflows without re-scanning source manifests.
 
     Stub nodes (external dependencies) are ignored during reconstruction.
+    Note: Some data loss is possible if the export format doesn't capture
+    every field of the original manifest (e.g., complex failure mode thresholds).
 
     Args:
-        data: Dictionary from export_graph_json() output
+        data: Dictionary from export_graph_json() output, containing 'nodes' and 'edges'
 
     Returns:
         List of reconstructed SCP manifests
 
     Raises:
-        ValueError: If data format is invalid
+        ValueError: If data format is invalid or missing required fields
 
     Example:
         >>> import json
+        >>> from scp_sdk import import_graph_json
+        >>>
         >>> with open("graph.json") as f:
         >>>     data = json.load(f)
+        >>>
         >>> manifests = import_graph_json(data)
-        >>> print(len(manifests))
+        >>> for manifest in manifests:
+        >>>     print(f"Loaded {manifest.system.name}")
     """
     manifests: list[SCPManifest] = []
     nodes = data.get("nodes", [])

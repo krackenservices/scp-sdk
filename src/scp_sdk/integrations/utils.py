@@ -5,7 +5,19 @@ import time
 
 
 class FieldMapper:
-    """Maps SCP fields to vendor-specific fields."""
+    """Maps SCP fields to vendor-specific fields.
+
+    Handles translation between the standardized SCP schema and vendor-specific
+    data models. Supports direct mapping and basic nesting.
+
+    Example:
+        >>> mapping = {
+        ...     "vendor_name": "system.name",
+        ...     "vendor_tier": "system.classification.tier"
+        ... }
+        >>> mapper = FieldMapper(mapping)
+        >>> result = mapper.map_fields(scp_data)
+    """
 
     def __init__(self, mapping: dict[str, str | list[str]]):
         """Initialize with field mapping configuration.
@@ -13,7 +25,7 @@ class FieldMapper:
         Args:
             mapping: Dictionary mapping vendor fields to SCP fields
                     Values can be:
-                    - string: direct SCP field name
+                    - string: dot-notation path to SCP field (e.g. "system.name")
                     - list: multiple SCP fields (combined strategy varies)
         """
         self.mapping = mapping
@@ -63,7 +75,19 @@ class FieldMapper:
 
 
 class IDCache:
-    """Cache URN to vendor ID mappings."""
+    """Cache URN to vendor ID mappings.
+
+    Minimizes API calls by caching resolved vendor IDs.
+    Essential for performance when syncing large graphs.
+
+    Example:
+        >>> cache = IDCache()
+        >>> # Get with fetch fallback
+        >>> vendor_id = cache.get_or_fetch(
+        ...     urn="urn:scp:svc",
+        ...     fetch_fn=lambda u: api.lookup(u)
+        ... )
+    """
 
     def __init__(self):
         """Initialize empty cache."""
@@ -89,7 +113,9 @@ class IDCache:
         """
         self._cache[urn] = vendor_id
 
-    def get_or_fetch(self, urn: str, fetch_fn: Callable[[str], str | None]) -> str | None:
+    def get_or_fetch(
+        self, urn: str, fetch_fn: Callable[[str], str | None]
+    ) -> str | None:
         """Get cached ID or fetch if not cached.
 
         Args:
@@ -114,7 +140,15 @@ class IDCache:
 
 
 class BatchProcessor:
-    """Process items in batches with rate limiting."""
+    """Process items in batches with rate limiting.
+
+    Utility to handle API rate limits and optimize throughput.
+    Groups items into chunks and optionally sleeps between chunks.
+
+    Example:
+        >>> processor = BatchProcessor(batch_size=50, delay_seconds=0.5)
+        >>> processor.process(items, push_to_api)
+    """
 
     def __init__(self, batch_size: int = 100, delay_seconds: float = 0):
         """Initialize batch processor.
@@ -147,7 +181,19 @@ class BatchProcessor:
 
 
 class CommentBuilder:
-    """Build formatted comment/description fields."""
+    """Build formatted comment/description fields.
+
+    Generates standardized metadata blocks for vendor description fields.
+    Useful for ensuring SCP owners and contact info appear in vendor tools.
+
+    Example:
+        >>> builder = CommentBuilder()
+        >>> description = builder.build(system_data)
+        >>> # Result:
+        >>> # SCP Metadata:
+        >>> # Team: Checkout
+        >>> # Domain: Payments
+    """
 
     def __init__(self, template: str | None = None):
         """Initialize with optional template.

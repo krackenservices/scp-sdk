@@ -10,7 +10,20 @@ from pydantic import BaseModel, Field
 
 
 class AuthConfig(BaseModel):
-    """Authentication configuration."""
+    """Authentication configuration.
+
+    Flexible schema supporting various authentication methods.
+    Only fields relevant to the specific integration need to be populated.
+
+    Example:
+        >>> auth = AuthConfig(api_key="secret-key")
+        >>> # or
+        >>> auth = AuthConfig(
+        ...     client_id="id",
+        ...     client_secret="secret",
+        ...     token="oauth-token"
+        ... )
+    """
 
     api_key: str | None = None
     username: str | None = None
@@ -21,16 +34,34 @@ class AuthConfig(BaseModel):
 
 
 class IntegrationConfig(BaseModel):
-    """Standard configuration for integrations."""
+    """Standard configuration for integrations.
 
-    name: str
-    vendor: str | None = None
-    field_mappings: dict[str, Any] = Field(default_factory=dict)
-    auth: AuthConfig | None = None
-    batch_size: int = 100
-    timeout_seconds: int = 30
-    retry_attempts: int = 3
-    custom: dict[str, Any] = Field(default_factory=dict)
+    Provides a consistent configuration structure across all integrations.
+    Supports field mapping, authentication, and resilience settings.
+
+    Example:
+        >>> config = IntegrationConfig(
+        ...     name="pagerduty",
+        ...     auth=AuthConfig(api_key="..."),
+        ...     batch_size=50,
+        ...     custom={"default_severity": "critical"}
+        ... )
+    """
+
+    name: str = Field(description="Integration name (must match registered name)")
+    vendor: str | None = Field(
+        None, description="Optional vendor name if different from integration name"
+    )
+    field_mappings: dict[str, Any] = Field(
+        default_factory=dict, description="Map of vendor fields to SCP fields"
+    )
+    auth: AuthConfig | None = Field(None, description="Authentication credentials")
+    batch_size: int = Field(100, description="Items to process per batch")
+    timeout_seconds: int = Field(30, description="API timeout in seconds")
+    retry_attempts: int = Field(3, description="Number of retries for failed requests")
+    custom: dict[str, Any] = Field(
+        default_factory=dict, description="Integration-specific custom configuration"
+    )
 
 
 def substitute_env_vars(data: Any) -> Any:
@@ -88,11 +119,11 @@ def load_config(path: Path | str) -> IntegrationConfig:
     # Extract integration section if present
     if "integration" in data:
         config_data = data["integration"]
-        
+
         # Move auth if at root level
         if "auth" in data and "auth" not in config_data:
             config_data["auth"] = data["auth"]
-            
+
         # Move field_mappings if at root level
         if "field_mappings" in data and "field_mappings" not in config_data:
             config_data["field_mappings"] = data["field_mappings"]

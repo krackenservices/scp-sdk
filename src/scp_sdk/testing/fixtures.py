@@ -21,12 +21,17 @@ from ..core.models import (
 class GraphFixture:
     """Factory for test graphs.
 
+    Provides pre-built graph structures for testing graph algorithms and validation.
+
     Example:
+        >>> # Valid simple graph
         >>> graph = GraphFixture.simple_graph()
-        >>> assert len(graph) == 1
         >>>
+        >>> # Graph with 3 systems in a dependency chain
         >>> graph = GraphFixture.with_dependencies(3)
-        >>> assert len(list(graph.dependencies())) > 0
+        >>>
+        >>> # Graph with explicit validation issue
+        >>> graph = GraphFixture.invalid_graph("broken_dependency")
     """
 
     @staticmethod
