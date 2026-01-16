@@ -11,7 +11,11 @@ from .models import Dependency, ValidationIssue
 
 @dataclass
 class SystemNode:
-    """A system node in the architecture graph."""
+    """A system node in the architecture graph.
+
+    Represents a simplified view of a system optimized for graph traversal and analysis.
+    Derived from the richer System model in the manifest.
+    """
 
     urn: str
     name: str
@@ -60,7 +64,11 @@ class SystemNode:
 
 @dataclass
 class DependencyEdge:
-    """A dependency edge in the architecture graph."""
+    """A dependency edge in the architecture graph.
+
+    Represents a directed edge from one system (consumer) to another (provider).
+    Carries metadata about the relationship like criticality and failure modes.
+    """
 
     from_urn: str
     to_urn: str
@@ -96,12 +104,26 @@ class Graph:
     """Architecture graph built from SCP manifests.
 
     Provides efficient querying and traversal of system dependencies.
+    Supports loading from unified JSON format or building directly from manifests.
 
     Example:
+        >>> # Load from file
         >>> graph = Graph.from_file("graph.json")
-        >>> for system in graph.systems():
-        ...     print(system.name)
-        >>> deps = graph.dependencies_of(system)
+        >>>
+        >>> # Build from manifests
+        >>> manifests = [Manifest.from_file("scp.yaml")]
+        >>> graph = Graph.from_manifests(manifests)
+        >>>
+        >>> # Find a system
+        >>> payment = graph.find_system("urn:scp:payment-service")
+        >>>
+        >>> # Get dependencies (outbound edges)
+        >>> deps = graph.dependencies_of(payment)
+        >>> for edge in deps:
+        >>>     print(f"Depends on {edge.to_urn} ({edge.criticality})")
+        >>>
+        >>> # Get blast radius (inbound edges)
+        >>> dependents = graph.dependents_of(payment)
     """
 
     def __init__(self, systems: list[SystemNode], edges: list[DependencyEdge]):
@@ -243,7 +265,7 @@ class Graph:
         """Find a system by URN.
 
         Args:
-            urn: System URN to search for
+            urn: System URN to search for (e.g., "urn:scp:payment-service")
 
         Returns:
             SystemNode if found, None otherwise
@@ -253,8 +275,10 @@ class Graph:
     def dependencies_of(self, system: SystemNode | str) -> list[DependencyEdge]:
         """Get outbound dependencies of a system.
 
+        This returns edges where the given system is the CONSUMER (from_urn).
+
         Args:
-            system: SystemNode or URN string
+            system: SystemNode object or URN string
 
         Returns:
             List of outbound dependency edges
@@ -335,8 +359,11 @@ class Graph:
     def dependents_of(self, system: SystemNode | str) -> list[DependencyEdge]:
         """Get systems that depend on this system (blast radius).
 
+        This returns edges where the given system is the PROVIDER (to_urn).
+        Useful for analyzing impact of a system failure or change.
+
         Args:
-            system: SystemNode or URN string
+            system: SystemNode object or URN string
 
         Returns:
             List of inbound dependency edges

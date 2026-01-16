@@ -9,6 +9,20 @@ Python SDK for the **System Capability Protocol** (SCP) - programmatic access to
 - **Integration Framework**: Reusable base classes and utilities for building integrations (60-80% code reduction)
 - **Fully Tested**: Comprehensive test suite with pytest
 
+## Documentation
+
+- **[API Reference](docs/api-reference.md)**: Detailed API documentation for all modules.
+- **[Integration Guide](docs/integration-guide.md)**: Step-by-step tutorial for building custom integrations.
+- **[Examples](docs/examples.md)**: Common usage patterns and code snippets.
+
+## Architecture
+
+The SDK is composed of three main layers:
+
+1.  **Core (`scp_sdk.core`)**: Defines the data models (`SCPManifest`, `System`, `Dependency`) and the `Graph` abstraction for analyzing architecture.
+2.  **Integrations (`scp_sdk.integrations`)**: Provides a framework (`IntegrationBase`, `IntegrationConfig`) for syncing SCP data to external tools (PagerDuty, ServiceNow, etc.).
+3.  **Utilities (`scp_sdk.utils`)**: Helper functions for tier handling and common tasks.
+
 ## Installation
 
 ```bash

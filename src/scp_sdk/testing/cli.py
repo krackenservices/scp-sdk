@@ -23,14 +23,17 @@ class CLITestHelper:
     """Helper for testing Typer CLI applications.
 
     Provides convenient methods for running CLI commands with mocked
-    dependencies and temporary files.
+    dependencies and temporary files. Wraps `typer.testing.CliRunner`.
 
     Example:
-        >>> from typer import Typer
-        >>> app = Typer()
+        >>> app = typer.Typer()
+        >>> @app.command()
+        >>> def hello(name: str):
+        >>>     print(f"Hello {name}")
+        >>>
         >>> helper = CLITestHelper(app)
-        >>> result = helper.run(["command", "--flag"])
-        >>> assert result.exit_code == 0
+        >>> result = helper.run(["hello", "World"])
+        >>> helper.assert_success(result, "Hello World")
     """
 
     def __init__(self, app: Any):
