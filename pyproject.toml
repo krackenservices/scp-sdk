@@ -29,8 +29,8 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/scp_sdk"]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=9.0.2",
     "pytest-cov>=6.0.0",
     "mypy>=1.15.0",
@@ -38,4 +38,8 @@ dev-dependencies = [
     "ipython>=8.32.0",
     "typer>=0.9.0",  # For CLI testing utilities
     "types-pyyaml>=6.0",
+    # Documentation
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
 ]

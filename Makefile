@@ -1,4 +1,4 @@
-.PHONY: help setup test lint format build clean examples
+.PHONY: help setup test lint format build clean examples docs
 
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -44,13 +44,25 @@ examples: ## Run all examples
 	@echo "\nRunning integration example..."
 	uv run python examples/custom_integration.py
 
+docs: ## Build documentation
+	uv run mkdocs build
+
+docs-serve: ## Serve documentation locally
+	uv run mkdocs serve
+
+docs-deploy: ## Deploy documentation to GitHub Pages
+	uv run mkdocs gh-deploy
+
 clean: ## Clean build artifacts and caches
 	rm -rf build/ dist/ *.egg-info/
 	rm -rf .pytest_cache/ .ruff_cache/ .mypy_cache/
 	rm -rf htmlcov/ .coverage
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 
+clean-docs: ## Clean generated documentation
+	rm -rf site/
+
 clean-venv: ## Remove virtual environment
 	rm -rf .venv/
 
-clean-all: clean clean-venv ## Full cleanup including venv
+clean-all: clean clean-docs clean-venv ## Full cleanup including venv and docs

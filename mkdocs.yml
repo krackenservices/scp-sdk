@@ -1,0 +1,77 @@
+site_name: SCP SDK
+site_description: Python SDK for System Capability Protocol - programmatic manifest/graph access and integration framework
+site_url: https://krackenservices.github.io/scp-sdk/
+repo_url: https://github.com/krackenservices/scp-sdk
+repo_name: krackenservices/scp-sdk
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            merge_init_into_class: true
+            show_if_no_docstring: false
+            inherited_members: true
+            signature_crossrefs: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started.md
+      - Quick Start: examples.md
+  - User Guide:
+      - API Reference (Manual): api-reference.md
+      - Integration Guide: integration-guide.md
+  - API Reference:
+      - Core: reference/core.md
+      - Integrations: reference/integrations.md
+      - Testing: reference/testing.md
+      - Utilities: reference/utils.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/krackenservices/scp-sdk
