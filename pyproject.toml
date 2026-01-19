@@ -40,8 +40,8 @@ runtime = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/krackenservices/scp-sdk"
-Documentation = "https://systemcapabilityprotocol.com/"
+Homepage = "https://systemcapabilityprotocol.com/"
+Documentation = "https://systemcapabilityprotocol.com/sdk"
 Repository = "https://github.com/krackenservices/scp-sdk.git"
 Issues = "https://github.com/krackenservices/scp-sdk/issues"
 
