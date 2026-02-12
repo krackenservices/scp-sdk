@@ -3,8 +3,51 @@
 These models match the SCP v0.1.0 schema specification.
 """
 
-from typing import Literal
-from pydantic import BaseModel, Field
+from typing import Literal, ClassVar, Any
+from pydantic import BaseModel, Field, ConfigDict, model_validator
+
+# ============================================================================
+# Base Model
+# ============================================================================
+
+
+class StrictModel(BaseModel):
+    """Base model that enforces strict validation rules.
+
+    By default:
+    - Allows extra fields only if they start with 'x-' (Extension pattern).
+    - Forbids all other extra fields.
+
+    In strict mode:
+    - Forbids ALL extra fields, including extensions.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    # Class variable to toggle strict mode globally for validation context
+    _strict_mode: ClassVar[bool] = False
+
+    @model_validator(mode="after")
+    def check_extra_fields(self) -> Any:
+        # Check if we have any extra fields
+        if not self.model_extra:
+            return self
+
+        # In strict mode, NO extra fields are allowed
+        if self._strict_mode:
+            # We raise ValueError which Pydantic converts to ValidationError
+            raise ValueError(
+                f"Strict mode enabled: Extra fields not permitted: {list(self.model_extra.keys())}"
+            )
+
+        # In normal mode, only 'x-' fields are allowed
+        for key in self.model_extra.keys():
+            if not key.startswith("x-"):
+                raise ValueError(
+                    f"Extra field '{key}' not permitted. Only fields starting with 'x-' are allowed as extensions."
+                )
+
+        return self
 
 
 # ============================================================================
@@ -12,7 +55,7 @@ from pydantic import BaseModel, Field
 # ============================================================================
 
 
-class Contact(BaseModel):
+class Contact(StrictModel):
     """Contact channel for a team.
 
     Defines how to reach a team through various communication channels.
@@ -27,7 +70,7 @@ class Contact(BaseModel):
     )
 
 
-class Contract(BaseModel):
+class Contract(StrictModel):
     """API contract specification reference.
 
     Points to machine-readable API specifications for capabilities.
@@ -44,7 +87,7 @@ class Contract(BaseModel):
     )
 
 
-class SLA(BaseModel):
+class SLA(StrictModel):
     """Service level agreement targets.
 
     Defines performance and reliability commitments for a capability.
@@ -67,7 +110,7 @@ class SLA(BaseModel):
     )
 
 
-class RetryConfig(BaseModel):
+class RetryConfig(StrictModel):
     """Retry configuration for dependencies.
 
     Defines how a system should retry failed requests to a dependency.
@@ -83,7 +126,7 @@ class RetryConfig(BaseModel):
     )
 
 
-class CircuitBreakerConfig(BaseModel):
+class CircuitBreakerConfig(StrictModel):
     """Circuit breaker configuration.
 
     Implements the circuit breaker pattern to prevent cascading failures.
@@ -100,7 +143,7 @@ class CircuitBreakerConfig(BaseModel):
     )
 
 
-class SecurityConstraints(BaseModel):
+class SecurityConstraints(StrictModel):
     """Security-related constraints.
 
     Defines security requirements and configurations for the system.
@@ -121,7 +164,7 @@ class SecurityConstraints(BaseModel):
     )
 
 
-class ComplianceConstraints(BaseModel):
+class ComplianceConstraints(StrictModel):
     """Compliance-related constraints.
 
     Defines regulatory and compliance requirements.
@@ -141,7 +184,7 @@ class ComplianceConstraints(BaseModel):
     )
 
 
-class OperationalConstraints(BaseModel):
+class OperationalConstraints(StrictModel):
     """Operational constraints.
 
     Defines operational requirements and limitations.
@@ -160,7 +203,7 @@ class OperationalConstraints(BaseModel):
     )
 
 
-class KubernetesRuntime(BaseModel):
+class KubernetesRuntime(StrictModel):
     """Kubernetes deployment information.
 
     Identifies Kubernetes resources for the system.
@@ -178,7 +221,7 @@ class KubernetesRuntime(BaseModel):
     )
 
 
-class AWSRuntime(BaseModel):
+class AWSRuntime(StrictModel):
     """AWS deployment information.
 
     Identifies AWS resources for the system.
@@ -192,7 +235,7 @@ class AWSRuntime(BaseModel):
     arn: str | None = Field(default=None, description="Resource ARN")
 
 
-class Environment(BaseModel):
+class Environment(StrictModel):
     """Runtime environment configuration."""
 
     otel_service_name: str | None = Field(
@@ -207,14 +250,14 @@ class Environment(BaseModel):
     aws: AWSRuntime | None = Field(default=None, description="AWS deployment details")
 
 
-class FailureModeThresholds(BaseModel):
+class FailureModeThresholds(StrictModel):
     """Thresholds for failure mode detection."""
 
     warning_ms: int | None = None
     critical_ms: int | None = None
 
 
-class SecurityExtension(BaseModel):
+class SecurityExtension(StrictModel):
     """OpenC2-inspired security capability metadata.
 
     Used to describe what actions a security tool supports,
@@ -238,7 +281,7 @@ class SecurityExtension(BaseModel):
 # ============================================================================
 
 
-class Classification(BaseModel):
+class Classification(StrictModel):
     """System classification metadata.
 
     Categorizes systems by criticality,domain, and other attributes.
@@ -260,7 +303,7 @@ class Classification(BaseModel):
     )
 
 
-class System(BaseModel):
+class System(StrictModel):
     """Core system identification."""
 
     urn: str = Field(
@@ -282,7 +325,7 @@ class System(BaseModel):
     )
 
 
-class Ownership(BaseModel):
+class Ownership(StrictModel):
     """Team ownership and contact information.
 
     Defines who is responsible for the system and how to reach them.
@@ -299,7 +342,7 @@ class Ownership(BaseModel):
     )
 
 
-class Capability(BaseModel):
+class Capability(StrictModel):
     """A capability provided by the system.
 
     Represents a service, API, event stream, or data store that the system provides.
@@ -339,7 +382,7 @@ class Capability(BaseModel):
     )
 
 
-class Dependency(BaseModel):
+class Dependency(StrictModel):
     """A dependency on another system.
 
     Defines a relationship where this system relies on another system's capability.
@@ -394,7 +437,7 @@ class Dependency(BaseModel):
     )
 
 
-class Constraints(BaseModel):
+class Constraints(StrictModel):
     """System constraints.
 
     Groups all constraint-related configurations covering security, compliance,
@@ -412,7 +455,7 @@ class Constraints(BaseModel):
     )
 
 
-class Runtime(BaseModel):
+class Runtime(StrictModel):
     """Runtime environment configurations.
 
     Maps deployment environments (e.g., 'production', 'staging') to their
@@ -425,7 +468,7 @@ class Runtime(BaseModel):
     )
 
 
-class FailureMode(BaseModel):
+class FailureMode(StrictModel):
     """Known failure mode and its characteristics.
 
     Documents specific ways the system might fail and the expected impact.
@@ -465,7 +508,7 @@ class FailureMode(BaseModel):
 # ============================================================================
 
 
-class SCPManifest(BaseModel):
+class SCPManifest(StrictModel):
     """Root SCP manifest model.
 
     This represents a complete scp.yaml file.
