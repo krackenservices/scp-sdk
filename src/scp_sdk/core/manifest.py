@@ -6,7 +6,7 @@ from typing import Self
 import yaml
 from pydantic import ValidationError
 
-from .models import SCPManifest, Dependency, Capability
+from .models import SCPManifest, Dependency, Capability, StrictModel
 
 
 class ValidationResult:
@@ -120,19 +120,31 @@ class Manifest:
         """
         return self._data.model_dump(mode="json", exclude_none=True)
 
-    def validate(self) -> ValidationResult:
+    def validate(self, strict: bool = False) -> ValidationResult:
         """Validate the manifest.
+
+        Args:
+            strict: If True, disallow even 'x-' extension fields
 
         Returns:
             ValidationResult with any errors
         """
         try:
+            # Set strict mode context
+            StrictModel._strict_mode = strict
+
             # Re-validate the model
             SCPManifest.model_validate(self._data.model_dump())
             return ValidationResult(valid=True)
         except ValidationError as e:
             errors = [f"{err['loc']}: {err['msg']}" for err in e.errors()]
             return ValidationResult(valid=False, errors=errors)
+        except ValueError as e:
+            # Catch ValueError from StrictModel validator that might not be wrapped
+            return ValidationResult(valid=False, errors=[str(e)])
+        finally:
+            # Always reset strict mode
+            StrictModel._strict_mode = False
 
     def get_dependency(self, urn: str) -> Dependency | None:
         """Get a dependency by system URN.
